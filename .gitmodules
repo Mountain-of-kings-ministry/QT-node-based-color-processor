@@ -1,0 +1,3 @@
+[submodule "third_parties/node"]
+	path = third_parties/node
+	url = https://github.com/Mountain-of-kings-ministry/Qt-Node-editor

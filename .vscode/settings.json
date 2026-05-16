@@ -1,0 +1,20 @@
+{
+  "cmake.sourceDirectory": "/home/david/Documents/projects/learn/kingsdaw",
+  "files.exclude": {
+    "**/third_parties": true,
+    "**/web": true,
+    "**/resources/icons/**": true
+  },
+
+  "search.exclude": {
+    "**/web": true,
+    "**/third_parties": true,
+    "**/resources/icons/**": true
+  },
+
+  "files.watcherExclude": {
+    "**/web": true,
+    "**/third_parties": true,
+    "**/resources/icons/**": true
+  }
+}

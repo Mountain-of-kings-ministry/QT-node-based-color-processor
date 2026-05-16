@@ -1,0 +1,20 @@
+{
+  "cmake.sourceDirectory": "${workspaceFolder}/code",
+
+  "file_scan_exclusions": [
+    "**/.git",
+    "**/.svn",
+    "**/.hg",
+    "**/.jj",
+    "**/CVS",
+    "**/.DS_Store",
+    "**/Thumbs.db",
+    "**/.classpath",
+    "**/.settings",
+
+    "**/third_parties/**",
+    "**/backup/**",
+    "**/resources/icons/**",
+    "**/web/**"
+  ],
+}
