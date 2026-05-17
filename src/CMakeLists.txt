@@ -1,4 +1,10 @@
+add_subdirectory(core)
+add_subdirectory(nodes)
 add_subdirectory(functions)
 add_subdirectory(providers)
 add_subdirectory(pages)
 add_subdirectory(resources)
+
+if(BUILD_GUI)
+    add_subdirectory(ui)
+endif()

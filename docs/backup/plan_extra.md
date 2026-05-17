@@ -147,3 +147,38 @@ Would you like me to also provide:
 3. `conan.cmake` or `vcpkg` version (optional)
 
 Just say what you need next and I’ll provide it.
+
+
+All three systems are verified working. Here's the summary:
+
+## What was delivered
+
+### CLI (`mokm-cli`)
+- ✅ Builds, runs, handles `--help`, `--version`, `--list-cs`
+- ✅ Links `MOKMColorLib.so` + `OpenColorIO` as shared deps
+- ✅ Image processing pipeline ready (`PipelineExecutor`, `NodeGraph`, `OCIOWrapper`)
+
+### GUI (`appMOKM_Color_Processor`)
+- ✅ Launches with zero errors, splash → main window
+- ✅ Refactored into reusable `MOKMApplication` class
+- ✅ `main.cpp` is now just 5 lines: create app, exec
+
+### Integration System (embedding into other apps)
+- **`MOKMApplication` API** (`include/mokm/MOKMApplication.h`) — single class wraps all setup: `QApplication`, `GraphModel`, type registration, QML engine, import paths, preview window
+- **Shared libraries** — `libMOKMColorLib.so`, `libMOKMColorNodes.so`, `libMOKMColorGUI.so` (respects `BUILD_SHARED_LIBS=ON`)
+- **`MOKMConfig.cmake`** — generated at `build/debug/MOKMConfig.cmake`, provides IMPORTED targets `MOKM::MOKMColorLib`, `MOKM::MOKMColorNodes`, `MOKM::MOKMColorGUI` with auto `find_dependency(Qt6)` and `find_dependency(OpenColorIO)`
+- **Headers installed** — `include/mokm/` (core + MOKMApplication) and `include/NodeEditor/`
+- **Export macro** — `MOKM_EXPORT` in `include/mokm/Export.h` for DLL visibility
+
+### How another app embeds the GUI
+```cmake
+find_package(MOKM REQUIRED)
+target_link_libraries(myapp PRIVATE MOKM::MOKMColorGUI)
+```
+```cpp
+#include <mokm/MOKMApplication.h>
+int main(int argc, char *argv[]) {
+    mokm::MOKMApplication app(argc, argv);
+    return app.exec();
+}
+```

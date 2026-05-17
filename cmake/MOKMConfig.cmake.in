@@ -1,0 +1,41 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+find_dependency(Qt6 REQUIRED COMPONENTS Core Gui Widgets Qml Quick QuickControls2)
+find_dependency(OpenColorIO CONFIG)
+
+set_and_check(MOKM_INCLUDE_DIR "@PACKAGE_CMAKE_INSTALL_INCLUDEDIR@")
+set_and_check(MOKM_LIB_DIR "@PACKAGE_CMAKE_INSTALL_LIBDIR@")
+
+# ── MOKMColorLib ────────────────────────────────────────────────
+if(NOT TARGET MOKM::MOKMColorLib)
+    add_library(MOKM::MOKMColorLib SHARED IMPORTED)
+    set_target_properties(MOKM::MOKMColorLib PROPERTIES
+        IMPORTED_LOCATION "${MOKM_LIB_DIR}/libMOKMColorLib.so"
+        INTERFACE_INCLUDE_DIRECTORIES "${MOKM_INCLUDE_DIR}"
+        INTERFACE_LINK_LIBRARIES "Qt6::Core;OpenColorIO::OpenColorIO"
+    )
+endif()
+
+# ── MOKMColorNodes ──────────────────────────────────────────────
+if(NOT TARGET MOKM::MOKMColorNodes)
+    add_library(MOKM::MOKMColorNodes SHARED IMPORTED)
+    set_target_properties(MOKM::MOKMColorNodes PROPERTIES
+        IMPORTED_LOCATION "${MOKM_LIB_DIR}/libMOKMColorNodes.so"
+        INTERFACE_INCLUDE_DIRECTORIES "${MOKM_INCLUDE_DIR}"
+        INTERFACE_LINK_LIBRARIES "MOKM::MOKMColorLib"
+    )
+endif()
+
+# ── MOKMColorGUI ────────────────────────────────────────────────
+if(NOT TARGET MOKM::MOKMColorGUI)
+    add_library(MOKM::MOKMColorGUI SHARED IMPORTED)
+    set_target_properties(MOKM::MOKMColorGUI PROPERTIES
+        IMPORTED_LOCATION "${MOKM_LIB_DIR}/libMOKMColorGUI.so"
+        INTERFACE_INCLUDE_DIRECTORIES "${MOKM_INCLUDE_DIR}"
+        INTERFACE_LINK_LIBRARIES "MOKM::MOKMColorNodes;Qt6::Qml;Qt6::Quick"
+    )
+endif()
+
+check_required_components(MOKM)

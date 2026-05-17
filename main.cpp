@@ -1,24 +1,9 @@
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
+#include <QApplication>
 
-#include "someclass.h"
+#include "mokm/MOKMApplication.h"
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
-
-    qmlRegisterType<someClass>("kingClass", 1, 0, "SomeClass");
-
-    QQmlApplicationEngine engine;
-    QObject::connect(
-        &engine,
-        &QQmlApplicationEngine::objectCreationFailed,
-        &app,
-        []()
-        { QCoreApplication::exit(-1); },
-        Qt::QueuedConnection);
-    engine.loadFromModule("learConnection_2", "SplashScreen");
-
-    return QCoreApplication::exec();
+    mokm::MOKMApplication app(argc, argv);
+    return app.exec();
 }

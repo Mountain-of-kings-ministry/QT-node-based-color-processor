@@ -1,65 +1,160 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import kingClass
-import learConnection_2
+import QtQuick.Dialogs
+import NodeEditor
+import MOKM_Color_Processor
 
 Window {
-    width: 640
-    height: 480
+    id: root
+    width: 1280
+    height: 800
     visible: true
-    title: qsTr("Learning Connections")
+    title: qsTr("MOKM Color Processor")
 
-    // Use loaded theme as the app color source
     color: Theme.background
 
-    SomeClass {
-        id: someClass
-    }
+    RowLayout {
+        anchors.fill: parent
+        spacing: 0
 
-    Connections {
-        target: someClass
-        onManagerChanged: inputxt.text = someClass.getManagerState()
-    }
+        // Left sidebar
+        Rectangle {
+            Layout.preferredWidth: 48
+            Layout.fillHeight: true
+            color: Theme.surface
+            border.width: 1
+            border.color: Theme.border
 
-    ColumnLayout {
-        x: 180
-        y: 155
-        width: 281
-        height: 171
-
-        Text {
-            id: inputxt
-            // text: someClass.getManagerState()
-        }
-
-        Button {
-            id: button
-            text: "clcik me to see state change"
-            icon.source: "qrc:/icons/outline/aerial-lift.svg"
-            display: AbstractButton.TextBesideIcon
-            hoverEnabled: true
-
-            background: Rectangle {
-                id: buttonBg
+            ColumnLayout {
                 anchors.fill: parent
-                color: Theme.primary
-                radius: 6
-            }
+                spacing: 0
 
-            onHoveredChanged: {
-                buttonBg.color = hovered ? Theme.primaryHover : Theme.primary;
-            }
-            onClicked: {
-                someClass.setManager("kings manager state");
-            }
+                ToolButton {
+                    Layout.preferredWidth: 48
+                    Layout.preferredHeight: 48
+                    icon.source: "qrc:/icons/outline/folder.svg"
+                    icon.color: Theme.foregroundMuted
+                    hoverEnabled: true
+                    background: Rectangle {
+                        color: parent.hovered ? Theme.surfaceHover : "transparent"
+                    }
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Open Config"
+                    onClicked: configDialog.open()
+                }
 
-            Connections {
-                target: button
-                function onClicked() {
-                    console.log("clicked");
+                ToolButton {
+                    Layout.preferredWidth: 48
+                    Layout.preferredHeight: 48
+                    icon.source: "qrc:/icons/outline/adjustments-horizontal.svg"
+                    icon.color: Theme.foregroundMuted
+                    hoverEnabled: true
+                    background: Rectangle {
+                        color: parent.hovered ? Theme.surfaceHover : "transparent"
+                    }
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Add Node"
+                    onClicked: {
+                        if (workspace.activeTab)
+                            workspace.openAddNodePopup()
+                    }
+                }
+
+                ToolButton {
+                    Layout.preferredWidth: 48
+                    Layout.preferredHeight: 48
+                    icon.source: "qrc:/icons/outline/player-play.svg"
+                    icon.color: Theme.foregroundMuted
+                    hoverEnabled: true
+                    background: Rectangle {
+                        color: parent.hovered ? Theme.surfaceHover : "transparent"
+                    }
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Process All"
+                    onClicked: {
+                        if (workspace.activeTab)
+                            workspace.activeTab.engine.processAll()
+                    }
+                }
+
+                Item { Layout.fillHeight: true }
+
+                ToolButton {
+                    Layout.preferredWidth: 48
+                    Layout.preferredHeight: 48
+                    icon.source: "qrc:/icons/outline/settings.svg"
+                    icon.color: Theme.foregroundMuted
+                    hoverEnabled: true
+                    background: Rectangle {
+                        color: parent.hovered ? Theme.surfaceHover : "transparent"
+                    }
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Settings"
                 }
             }
+        }
+
+        // Node editor workspace
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            color: Theme.background
+
+            NodeEditorWorkspace {
+                id: workspace
+                anchors.fill: parent
+                showTopBar: true
+                showBottomBar: true
+            }
+        }
+
+        // Right sidebar (properties for selected node)
+        Rectangle {
+            Layout.preferredWidth: 240
+            Layout.fillHeight: true
+            color: Theme.surface
+            visible: workspace.selectedNodeId !== ""
+
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 8
+                spacing: 8
+
+                Text {
+                    text: "Properties"
+                    color: Theme.foreground
+                    font.pixelSize: 13
+                    font.bold: true
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 1
+                    color: Theme.border
+                }
+
+                PropertiesPanel {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    graphModel: workspace.effectiveGraphModel
+                    undoManager: workspace.effectiveUndoManager
+                    nodeId: workspace.selectedNodeId
+                }
+            }
+        }
+    }
+
+    // OCIO Config file dialog
+    FileDialog {
+        id: configDialog
+        title: "Open OCIO Config"
+        nameFilters: ["OCIO Configs (*.ocio)", "All Files (*)"]
+        onAccepted: {
+            var file = configDialog.selectedFile.toString()
+            file = file.replace(/^(file:\/{2})/, "")
+            if (workspace.activeTab)
+                workspace.activeTab.engine.processAll()
         }
     }
 }
