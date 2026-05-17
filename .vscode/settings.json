@@ -1,5 +1,5 @@
 {
-  "cmake.sourceDirectory": "/home/david/Documents/projects/learn/kingsdaw",
+  // "cmake.sourceDirectory": "/home/david/Documents/projects/learn/kingsdaw",
   "files.exclude": {
     "**/third_parties": true,
     "**/web": true,

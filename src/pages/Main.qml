@@ -109,40 +109,14 @@ Window {
             }
         }
 
-        // Right sidebar (properties for selected node)
-        Rectangle {
-            Layout.preferredWidth: 240
-            Layout.fillHeight: true
-            color: Theme.surface
-            visible: workspace.selectedNodeId !== ""
+    }
 
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 8
-                spacing: 8
-
-                Text {
-                    text: "Properties"
-                    color: Theme.foreground
-                    font.pixelSize: 13
-                    font.bold: true
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    height: 1
-                    color: Theme.border
-                }
-
-                PropertiesPanel {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    graphModel: workspace.effectiveGraphModel
-                    undoManager: workspace.effectiveUndoManager
-                    nodeId: workspace.selectedNodeId
-                }
-            }
-        }
+    // Floating preview display panel
+    DisplayPanel {
+        id: displayPanel
+        x: parent.width - width - 20
+        y: 50
+        z: 100
     }
 
     // OCIO Config file dialog

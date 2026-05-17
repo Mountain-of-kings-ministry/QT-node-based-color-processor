@@ -43,6 +43,7 @@ qt_add_qml_module(appMOKM_Color_Processor
         src/pages/Main.qml
         src/pages/SplashScreen.qml
         src/pages/Theme.qml
+        src/pages/DisplayPanel.qml
     RESOURCES src/resources/resources.qrc
 )
 

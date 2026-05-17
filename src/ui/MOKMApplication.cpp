@@ -9,7 +9,9 @@
 #include <QWindow>
 
 #include "nodes/registerMOKMNodes.h"
-#include "ui/PreviewWindow.h"
+#include "ui/DisplayImageProvider.h"
+#include "ui/DisplayImageHelper.h"
+#include "ui/FileDialogHelper.h"
 #include "nodes/output/PreviewNode.h"
 
 #include <NodeEditor/DefaultNodes.h>
@@ -36,7 +38,8 @@ public:
 
     QApplication app;
     NodeEditor::GraphModel registryModel;
-    PreviewWindow *previewWindow = nullptr;
+    DisplayImageProvider *displayProvider = nullptr;
+    DisplayImageHelper *displayHelper = nullptr;
     QQmlApplicationEngine *engine = nullptr;
 };
 
@@ -48,16 +51,19 @@ MOKMApplication::MOKMApplication(int &argc, char **argv)
 
     qRegisterMetaType<mokm::ImageBufferPtr>("mokm::ImageBufferPtr");
 
-    d->previewWindow = new PreviewWindow();
-    d->previewWindow->hide();
+    d->displayProvider = new DisplayImageProvider();
+
+    d->displayHelper = new DisplayImageHelper(d->displayProvider);
 
     PreviewNode::setPreviewCallback([this](QImage img, QString cs) {
-        QMetaObject::invokeMethod(d->previewWindow, [this, img, cs]() {
-            d->previewWindow->showImage(img, cs);
+        QMetaObject::invokeMethod(d->displayHelper, [this, img, cs]() {
+            d->displayHelper->updateImage(img, cs);
         }, Qt::QueuedConnection);
     });
 
     d->engine = new QQmlApplicationEngine();
+
+    d->engine->addImageProvider(QStringLiteral("mokmpreview"), d->displayProvider);
 
     QString binDir = QCoreApplication::applicationDirPath();
     QStringList candidates = {
@@ -72,8 +78,11 @@ MOKMApplication::MOKMApplication(int &argc, char **argv)
     qmlRegisterType<NodeEditor::DataFlowEngine>("NodeEditor", 1, 0, "DataFlowEngine");
     qmlRegisterType<NodeEditor::UndoManager>("NodeEditor", 1, 0, "UndoManager");
 
+    auto *fileHelper = new FileDialogHelper(d->engine);
+    d->engine->rootContext()->setContextProperty("_fileDialog", fileHelper);
+
     d->engine->rootContext()->setContextProperty("_nodeTypeRegistry", &d->registryModel);
-    d->engine->rootContext()->setContextProperty("_previewWindow", d->previewWindow);
+    d->engine->rootContext()->setContextProperty("_displayHelper", d->displayHelper);
 
     QObject::connect(
         d->engine,
@@ -104,11 +113,6 @@ QWindow *MOKMApplication::mainWindow() const
 NodeEditor::GraphModel *MOKMApplication::registryModel() const
 {
     return &d->registryModel;
-}
-
-PreviewWindow *MOKMApplication::previewWindow() const
-{
-    return d->previewWindow;
 }
 
 QQmlApplicationEngine *MOKMApplication::engine() const

@@ -9,8 +9,6 @@ class QWindow;
 
 namespace NodeEditor { class GraphModel; }
 
-class PreviewWindow;
-
 namespace mokm {
 
 class MOKM_EXPORT MOKMApplication {
@@ -21,7 +19,6 @@ public:
     int exec();
     QWindow *mainWindow() const;
     NodeEditor::GraphModel *registryModel() const;
-    PreviewWindow *previewWindow() const;
     QQmlApplicationEngine *engine() const;
 
 private:

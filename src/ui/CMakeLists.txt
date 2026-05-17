@@ -1,5 +1,7 @@
 add_library(MOKMColorGUI
-    PreviewWindow.cpp
+    FileDialogHelper.cpp
+    DisplayImageProvider.cpp
+    DisplayImageHelper.cpp
     MOKMApplication.cpp
 )
 
